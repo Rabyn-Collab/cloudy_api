@@ -8,7 +8,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { getDatabase } from 'firebase-admin/database';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-const serviceAccount = require('./data.json');
+const serviceAccount = require('./service.json');
 const app = express();
 
 
