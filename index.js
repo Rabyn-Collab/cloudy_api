@@ -93,6 +93,13 @@ app.delete("/api/files/:public_id", async (req, res) => {
 app.delete('/api/users/:uid', async (req, res) => {
   const uid = req.params.uid;
   try {
+
+    const isExist = await auth.getUser(uid);
+    if (!isExist) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    await cloudinary.uploader.destroy(isExist.public_id);
+
     // Delete from Firebase Authentication
     await auth.deleteUser(uid);
     console.log(`✅ Successfully deleted user: ${uid}`);
