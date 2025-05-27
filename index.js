@@ -94,11 +94,14 @@ app.delete('/api/users/:uid', async (req, res) => {
   const uid = req.params.uid;
   try {
 
-    const isExist = await auth.getUser(uid);
-    if (!isExist) {
+    const isExist = await db.collection('users').doc(uid).get();
+    console.log(isExist.data());
+
+
+    if (!isExist.data()) {
       return res.status(404).json({ error: 'User not found' });
     }
-    await cloudinary.uploader.destroy(isExist.public_id);
+    await cloudinary.uploader.destroy(isExist.data()['public_id']);
 
     // Delete from Firebase Authentication
     await auth.deleteUser(uid);
@@ -109,10 +112,12 @@ app.delete('/api/users/:uid', async (req, res) => {
     console.log('✅ Deleted user document from Firestore');
 
     // Delete from Realtime Database
-    await rtdb.ref(`users/${uid}`).remove();
+    // await rtdb.ref(`users/${uid}`).remove();
     console.log('✅ Deleted user data from Realtime Database');
+    return res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
-    console.error('❌ Error deleting user:', error);
+    return res.status(500).json({ error: `${error}` });
+
   }
 
 });
